@@ -10,8 +10,6 @@
 **Curso:** Engenharia de Software
 **Instituição:** UTFPR – Universidade Tecnológica Federal do Paraná
 
-
-
 ---
 
 ## 📖 Sobre o Projeto
