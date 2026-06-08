@@ -71,9 +71,10 @@ O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência 
 ✔ Controle da quantidade de empréstimos do usuário  
 
 ### 🔐 Administrador
+
 ✔ Cadastro de administrador  
 ✔ Login do administrador  
-✔ Validação de login duplicado  
+✔ Validação de login duplicado
 ---
 
 ## 🏗️ Arquitetura do Projeto
