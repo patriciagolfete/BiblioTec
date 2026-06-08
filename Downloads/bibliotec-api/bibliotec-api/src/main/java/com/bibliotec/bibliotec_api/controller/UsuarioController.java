@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -48,5 +49,10 @@ public class UsuarioController {
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id) {
         repository.deleteById(id);
-    }   
+    }
+    
+    @GetMapping("/buscar")
+    public List<Usuario> buscarPorNome(@RequestParam String nome) {
+        return repository.findByNomeContainingIgnoreCase(nome);
+}
 }

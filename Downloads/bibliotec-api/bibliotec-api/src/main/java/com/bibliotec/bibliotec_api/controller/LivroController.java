@@ -60,4 +60,14 @@ public class LivroController {
     public List<Livro> listarPorEditora() {
         return repository.findAllByOrderByEditoraAsc();
     }
+    
+    @GetMapping("/disponiveis")
+    public List<Livro> listarDisponiveis() {
+        return repository.findByDisponivel(true);
+    }
+
+    @GetMapping("/emprestados")
+    public List<Livro> listarEmprestados() {
+        return repository.findByDisponivel(false);
+    }
 }

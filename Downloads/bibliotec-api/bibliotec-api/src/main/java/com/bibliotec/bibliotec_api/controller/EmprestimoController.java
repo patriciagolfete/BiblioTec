@@ -111,4 +111,9 @@ public class EmprestimoController {
     return repository.save(emprestimo);
 }
     
+    @GetMapping("/relatorio/livros-emprestados")
+    public List<Emprestimo> relatorioLivrosEmprestados() {
+        return repository.findByStatus("EM_ABERTO");
+    }
+    
 }
