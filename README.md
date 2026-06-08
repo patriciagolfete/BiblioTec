@@ -1,14 +1,16 @@
 <div align="center">
   <img src="https://github.com/user-attachments/assets/de628e7c-a980-46ba-9a4e-42746d2cb16c" width="250"/>
-</div>
 
-# 📚 BiblioTec
+
+#  BiblioTec
 
 ### Sistema de Gerenciamento de Biblioteca
 
 **Disciplina:** Programação Orientada a Objetos II
 **Curso:** Engenharia de Software
 **Instituição:** UTFPR – Universidade Tecnológica Federal do Paraná
+
+</div>
 
 ---
 
