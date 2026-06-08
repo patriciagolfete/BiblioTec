@@ -77,4 +77,34 @@ public class EmprestimoController {
     public void excluir(@PathVariable Long id) {
         repository.deleteById(id);
     }
+    
+    @PutMapping("/{id}/devolver")
+    public Emprestimo devolver(@PathVariable Long id) {
+
+    Emprestimo emprestimo = repository.findById(id).orElse(null);
+
+    if (emprestimo == null) {
+        return null;
+    }
+
+    Livro livro = emprestimo.getLivro();
+    Usuario usuario = emprestimo.getUsuario();
+
+    livro.setDisponivel(true);
+
+    if (usuario.getQntEmprestimos() > 0) {
+        usuario.setQntEmprestimos(
+            usuario.getQntEmprestimos() - 1
+        );
+    }
+
+    emprestimo.setStatus("DEVOLVIDO");
+    emprestimo.setDataDevolucao(java.time.LocalDate.now());
+
+    livroRepository.save(livro);
+    usuarioRepository.save(usuario);
+
+    return repository.save(emprestimo);
+}
+    
 }
