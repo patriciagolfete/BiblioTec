@@ -22,6 +22,17 @@ O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência 
 </div>
 ---
 
+## 🚀 Tecnologias Utilizadas
+
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge\&logo=openjdk\&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge\&logo=springboot\&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge\&logo=postgresql\&logoColor=white)
+![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge\&logo=hibernate\&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge\&logo=apachemaven\&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML-E34F26?style=for-the-badge\&logo=html5\&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS-1572B6?style=for-the-badge\&logo=css3\&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge\&logo=javascript\&logoColor=black)
+
 ### 👩‍💻 Integrantes
 
 [**Patricia Lacerda Golfete**](https://github.com/patriciagolfete)
@@ -29,14 +40,6 @@ O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência 
 [**Maria Vitória Mendes Storel**](https://github.com/m4riavit0ria)
 
 </div>
-
----
-
-## 📖 Sobre o Projeto
-
-O **BiblioTec** é um sistema de gerenciamento de biblioteca desenvolvido com o objetivo de auxiliar no controle de livros, usuários, empréstimos e devoluções, proporcionando maior organização e automação dos processos administrativos.
-
-O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência de dados em **PostgreSQL**, seguindo conceitos de **Programação Orientada a Objetos (POO)** e arquitetura **MVC (Model-View-Controller)**.
 
 ---
 
