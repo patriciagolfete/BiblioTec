@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/de628e7c-a980-46ba-9a4e-42746d2cb16c" width="250"/>
+  <img src="https://github.com/user-attachments/assets/de628e7c-a980-46ba-9a4e-42746d2cb16c" width="320"/>
 
 
 ### Sistema de Gerenciamento de Biblioteca
