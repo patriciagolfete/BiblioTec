@@ -22,6 +22,7 @@ O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência 
 
 [**Patricia Lacerda Golfete**](https://github.com/patriciagolfete) [**Maria Vitória Mendes Storel**](https://github.com/m4riavit0ria)
 </div>
+
 ---
 
 ## 🚀 Tecnologias Utilizadas
