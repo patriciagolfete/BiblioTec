@@ -46,39 +46,34 @@ O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência 
 ## 📌 Funcionalidades
 
 ### 👤 Usuários
-
-✔ Cadastro de usuários
-✔ Consulta de usuários
-✔ Alteração de usuários
-✔ Exclusão de usuários
-✔ Busca de usuários por nome
-✔ Validação para impedir cadastro duplicado por e-mail
+✔ Cadastro de usuários  
+✔ Consulta de usuários  
+✔ Alteração de usuários  
+✔ Exclusão de usuários  
+✔ Busca de usuários por nome  
+✔ Validação para impedir cadastro duplicado por e-mail  
 
 ### 📚 Livros
-
-✔ Cadastro de livros
-✔ Consulta de livros
-✔ Alteração de livros
-✔ Exclusão de livros
-✔ Ordenação por autor
-✔ Ordenação por editora
-✔ Consulta de livros disponíveis
-✔ Consulta de livros emprestados
+✔ Cadastro de livros  
+✔ Consulta de livros  
+✔ Alteração de livros  
+✔ Exclusão de livros  
+✔ Ordenação por autor  
+✔ Ordenação por editora  
+✔ Consulta de livros disponíveis  
+✔ Consulta de livros emprestados  
 
 ### 🔄 Empréstimos
-
-✔ Realização de empréstimos
-✔ Controle de disponibilidade do livro
-✔ Devolução de livros
-✔ Atualização automática do status do empréstimo
-✔ Controle da quantidade de empréstimos do usuário
+✔ Realização de empréstimos  
+✔ Controle de disponibilidade do livro  
+✔ Devolução de livros  
+✔ Atualização automática do status do empréstimo  
+✔ Controle da quantidade de empréstimos do usuário  
 
 ### 🔐 Administrador
-
-✔ Cadastro de administrador
-✔ Login do administrador
-✔ Validação de login duplicado
-
+✔ Cadastro de administrador  
+✔ Login do administrador  
+✔ Validação de login duplicado  
 ---
 
 ## 🏗️ Arquitetura do Projeto
