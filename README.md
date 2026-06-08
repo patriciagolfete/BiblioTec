@@ -1,4 +1,4 @@
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/a645889a-ed96-4bcb-a3aa-d76f9908bbd4" />
+<img width="1000" height="900" alt="image" src="https://github.com/user-attachments/assets/a645889a-ed96-4bcb-a3aa-d76f9908bbd4" />
 <div align="center">
 
 # 📚 BiblioTec
