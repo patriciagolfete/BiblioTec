@@ -75,6 +75,7 @@ O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência 
 ✔ Cadastro de administrador  
 ✔ Login do administrador  
 ✔ Validação de login duplicado
+
 ---
 
 ## 🏗️ Arquitetura do Projeto
