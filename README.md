@@ -10,8 +10,16 @@
 **Curso:** Engenharia de Software
 **Instituição:** UTFPR – Universidade Tecnológica Federal do Paraná
 
-</div>
 
+
+---
+## 📖 Sobre o Projeto
+
+O **BiblioTec** é um sistema de gerenciamento de biblioteca desenvolvido com o objetivo de auxiliar no controle de livros, usuários, empréstimos e devoluções, proporcionando maior organização e automação dos processos administrativos.
+
+O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência de dados em **PostgreSQL**, seguindo conceitos de **Programação Orientada a Objetos (POO)** e arquitetura **MVC (Model-View-Controller)**.
+
+</div>
 ---
 
 ### 👩‍💻 Integrantes
