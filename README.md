@@ -17,6 +17,12 @@ O **BiblioTec** é um sistema de gerenciamento de biblioteca desenvolvido com o 
 
 O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência de dados em **PostgreSQL**, seguindo conceitos de **Programação Orientada a Objetos (POO)** e arquitetura **MVC (Model-View-Controller)**.
 
+---
+### 👩‍💻 Integrantes
+
+[**Patricia Lacerda Golfete**](https://github.com/patriciagolfete)
+
+[**Maria Vitória Mendes Storel**](https://github.com/m4riavit0ria)
 </div>
 ---
 
@@ -31,15 +37,8 @@ O sistema foi desenvolvido utilizando **Java + Spring Boot**, com persistência 
 ![CSS3](https://img.shields.io/badge/CSS-1572B6?style=for-the-badge\&logo=css3\&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge\&logo=javascript\&logoColor=black)
 
-### 👩‍💻 Integrantes
-
-[**Patricia Lacerda Golfete**](https://github.com/patriciagolfete)
-
-[**Maria Vitória Mendes Storel**](https://github.com/m4riavit0ria)
-
-</div>
-
 ---
+
 
 ## 📌 Funcionalidades
 
