@@ -111,7 +111,7 @@ emprestimo
 ### 1. Clonar o repositório
 
 ```bash
-git clone LINK_DO_REPOSITORIO
+git clone https://github.com/patriciagolfete/bibliotec-api.git
 ```
 
 ### 2. Configurar PostgreSQL
@@ -188,8 +188,9 @@ POST /administradores/login
 
 <div align="center">
 
-  <img src="https://github.com/user-attachments/assets/de628e7c-a980-46ba-9a4e-42746d2cb16c" width="280"/>
-  
-**Tecnologia para conectar conhecimento**
+**BiblioTec**  
+Tecnologia para conectar conhecimento
+
+**Programação Orientada a Objetos II — UTFPR**
 
 </div>
