@@ -1,5 +1,6 @@
-
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/de628e7c-a980-46ba-9a4e-42746d2cb16c" /><div align="center">
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/de628e7c-a980-46ba-9a4e-42746d2cb16c" width="180"/>
+</div>
 
 # 📚 BiblioTec
 
