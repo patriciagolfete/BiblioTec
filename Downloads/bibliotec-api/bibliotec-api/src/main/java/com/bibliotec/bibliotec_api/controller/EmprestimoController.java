@@ -43,6 +43,10 @@ public class EmprestimoController {
         if (livro.getDisponivel() == false) {
             return null;
         }
+        
+        if (usuario.getQntEmprestimos() != null && usuario.getQntEmprestimos() >= 3) {
+            return null;
+        }
 
         livro.setDisponivel(false);
 

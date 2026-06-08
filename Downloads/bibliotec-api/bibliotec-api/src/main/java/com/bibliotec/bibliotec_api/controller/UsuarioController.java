@@ -27,7 +27,11 @@ public class UsuarioController {
 
     @PostMapping
     public Usuario salvar(@RequestBody Usuario usuario) {
-        return repository.save(usuario);
+        if (repository.findByEmail(usuario.getEmail()) != null) {
+            return null;
+    }
+
+    return repository.save(usuario);
     }
 
     @GetMapping("/{id}")

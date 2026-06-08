@@ -31,7 +31,7 @@ public class LivroController {
     }
     
     @PostMapping
-    public Livro Salvar(@RequestBody Livro livro){
+    public Livro salvar(@RequestBody Livro livro){
         return repository.save(livro);
     }
     
@@ -49,5 +49,15 @@ public class LivroController {
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id){
             repository.deleteById(id);
-    }  
+    }
+    
+    @GetMapping("/ordenar/autor")
+    public List<Livro> listarPorAutor() {
+        return repository.findAllByOrderByAutorAsc();
+}
+
+    @GetMapping("/ordenar/editora")
+    public List<Livro> listarPorEditora() {
+        return repository.findAllByOrderByEditoraAsc();
+    }
 }
