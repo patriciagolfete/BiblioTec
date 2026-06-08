@@ -2,8 +2,6 @@
   <img src="https://github.com/user-attachments/assets/de628e7c-a980-46ba-9a4e-42746d2cb16c" width="250"/>
 
 
-#  BiblioTec
-
 ### Sistema de Gerenciamento de Biblioteca
 
 **Disciplina:** Programação Orientada a Objetos II
