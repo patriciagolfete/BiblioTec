@@ -3,8 +3,6 @@
 
 # 📚 BiblioTec
 
-<img src="logo.png" width="260"/>
-
 ### Sistema de Gerenciamento de Biblioteca
 
 **Disciplina:** Programação Orientada a Objetos II
