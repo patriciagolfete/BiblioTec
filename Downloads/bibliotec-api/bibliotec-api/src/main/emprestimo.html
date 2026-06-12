@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empréstimos - BiblioTec</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+        }
+
+        .container-emprestimos {
+            width: 95%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .formulario {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .acoes {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-emprestimos">
+
+    <div class="formulario">
+
+        <h1>Gerenciar Empréstimos</h1>
+
+        <input type="number"
+               id="usuarioId"
+               placeholder="ID do Usuário">
+
+        <input type="number"
+               id="livroId"
+               placeholder="ID do Livro">
+
+        <button onclick="realizarEmprestimo()">
+            Realizar Empréstimo
+        </button>
+
+        <button onclick="listarEmprestimos()">
+            Empréstimos em Aberto
+        </button>
+
+        <button onclick="window.location.href='/dashboard.html'">
+            Voltar
+        </button>
+
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuário</th>
+            <th>Livro</th>
+            <th>Data Empréstimo</th>
+            <th>Ação</th>
+        </tr>
+        </thead>
+
+        <tbody id="tabelaEmprestimos"></tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+const API = "http://localhost:8082/emprestimos";
+
+window.onload = listarEmprestimos;
+
+function realizarEmprestimo() {
+
+    const usuarioId = document.getElementById("usuarioId").value;
+    const livroId = document.getElementById("livroId").value;
+
+    fetch(API, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            usuario: {
+                id: usuarioId
+            },
+            livro: {
+                id: livroId
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(() => {
+
+        document.getElementById("usuarioId").value = "";
+        document.getElementById("livroId").value = "";
+
+        listarEmprestimos();
+    });
+}
+
+function listarEmprestimos() {
+
+    fetch(API + "/relatorio/livros-emprestados")
+        .then(response => response.json())
+        .then(emprestimos => montarTabela(emprestimos));
+}
+
+function devolverLivro(id) {
+
+    fetch(API + "/" + id + "/devolver", {
+        method: "PUT"
+    })
+    .then(() => listarEmprestimos());
+}
+
+function montarTabela(emprestimos) {
+
+    const tabela = document.getElementById("tabelaEmprestimos");
+
+    tabela.innerHTML = "";
+
+    emprestimos.forEach(emprestimo => {
+
+        tabela.innerHTML += `
+            <tr>
+                <td>${emprestimo.id}</td>
+                <td>${emprestimo.usuario?.nome ?? ''}</td>
+                <td>${emprestimo.livro?.titulo ?? ''}</td>
+                <td>${emprestimo.dataEmprestimo ?? ''}</td>
+                <td class="acoes">
+                    <button onclick="devolverLivro(${emprestimo.id})">
+                        Devolver
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+</script>
+
+</body>
+</html>
