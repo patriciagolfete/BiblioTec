@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Livros - BiblioTec</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .acoes {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .container-livros {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        .formulario {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .btn-voltar {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-livros">
+
+    <div class="formulario">
+        <h1>Gerenciar Livros</h1>
+
+        <input type="text" id="titulo" placeholder="Título">
+
+        <input type="text" id="autor" placeholder="Autor">
+
+        <input type="text" id="editora" placeholder="Editora">
+
+        <button onclick="cadastrarLivro()">
+            Cadastrar Livro
+        </button>
+
+        <button onclick="listarLivros()">
+            Listar Todos
+        </button>
+
+        <button onclick="listarDisponiveis()">
+            Livros Disponíveis
+        </button>
+
+        <button class="btn-voltar"
+                onclick="window.location.href='/dashboard.html'">
+            Voltar
+        </button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Editora</th>
+                <th>Disponível</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabelaLivros"></tbody>
+    </table>
+
+</div>
+
+<script>
+
+const API = "http://localhost:8082/livros";
+
+window.onload = listarLivros;
+
+function cadastrarLivro() {
+
+    const titulo = document.getElementById("titulo").value;
+    const autor = document.getElementById("autor").value;
+    const editora = document.getElementById("editora").value;
+
+    fetch(API, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            titulo: titulo,
+            autor: autor,
+            editora: editora,
+            disponivel: true
+        })
+    })
+    .then(() => {
+        limparFormulario();
+        listarLivros();
+    });
+}
+
+function listarLivros() {
+
+    fetch(API)
+        .then(response => response.json())
+        .then(dados => montarTabela(dados));
+}
+
+function listarDisponiveis() {
+
+    fetch(API + "/disponiveis")
+        .then(response => response.json())
+        .then(dados => montarTabela(dados));
+}
+
+function excluirLivro(id) {
+
+    if (!confirm("Deseja excluir este livro?")) {
+        return;
+    }
+
+    fetch(API + "/" + id, {
+        method: "DELETE"
+    })
+    .then(() => listarLivros());
+}
+
+function montarTabela(livros) {
+
+    const tabela = document.getElementById("tabelaLivros");
+
+    tabela.innerHTML = "";
+
+    livros.forEach(livro => {
+
+        tabela.innerHTML += `
+            <tr>
+                <td>${livro.id}</td>
+                <td>${livro.titulo}</td>
+                <td>${livro.autor}</td>
+                <td>${livro.editora}</td>
+                <td>${livro.disponivel ? 'Sim' : 'Não'}</td>
+                <td>
+                    <button onclick="excluirLivro(${livro.id})">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+function limparFormulario() {
+
+    document.getElementById("titulo").value = "";
+    document.getElementById("autor").value = "";
+    document.getElementById("editora").value = "";
+}
+
+</script>
+
+</body>
+</html>
