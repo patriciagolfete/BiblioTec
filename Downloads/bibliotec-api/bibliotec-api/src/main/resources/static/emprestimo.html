@@ -102,26 +102,27 @@ function realizarEmprestimo() {
     const usuarioId = document.getElementById("usuarioId").value;
     const livroId = document.getElementById("livroId").value;
 
+    const hoje = new Date().toISOString().split("T")[0];
+
     fetch(API, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
+            dataEmprestimo: hoje,
             usuario: {
-                id: usuarioId
+                id: Number(usuarioId)
             },
             livro: {
-                id: livroId
+                id: Number(livroId)
             }
         })
     })
     .then(response => response.json())
     .then(() => {
-
         document.getElementById("usuarioId").value = "";
         document.getElementById("livroId").value = "";
-
         listarEmprestimos();
     });
 }
