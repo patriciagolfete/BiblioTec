@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários - BiblioTec</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+        }
+
+        .container-usuarios {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        .formulario {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .acoes {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-usuarios">
+
+    <div class="formulario">
+
+        <h1>Gerenciar Usuários</h1>
+
+        <input type="text"
+               id="nome"
+               placeholder="Nome">
+
+        <input type="email"
+               id="email"
+               placeholder="E-mail">
+
+        <button onclick="cadastrarUsuario()">
+            Cadastrar Usuário
+        </button>
+
+        <hr>
+
+        <input type="text"
+               id="buscaNome"
+               placeholder="Buscar por nome">
+
+        <button onclick="buscarUsuario()">
+            Buscar
+        </button>
+
+        <button onclick="listarUsuarios()">
+            Listar Todos
+        </button>
+
+        <button onclick="window.location.href='/dashboard.html'">
+            Voltar
+        </button>
+
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>E-mail</th>
+        </tr>
+        </thead>
+
+        <tbody id="tabelaUsuarios"></tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+const API = "http://localhost:8082/usuarios";
+
+window.onload = listarUsuarios;
+
+function cadastrarUsuario() {
+
+    const nome = document.getElementById("nome").value;
+    const email = document.getElementById("email").value;
+
+    fetch(API, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            nome: nome,
+            email: email
+        })
+    })
+    .then(response => response.json())
+    .then(() => {
+
+        document.getElementById("nome").value = "";
+        document.getElementById("email").value = "";
+
+        listarUsuarios();
+    });
+}
+
+function listarUsuarios() {
+
+    fetch(API)
+        .then(response => response.json())
+        .then(usuarios => montarTabela(usuarios));
+}
+
+function buscarUsuario() {
+
+    const nome = document.getElementById("buscaNome").value;
+
+    fetch(API + "/buscar?nome=" + encodeURIComponent(nome))
+        .then(response => response.json())
+        .then(usuarios => montarTabela(usuarios));
+}
+
+function montarTabela(usuarios) {
+
+    const tabela = document.getElementById("tabelaUsuarios");
+
+    tabela.innerHTML = "";
+
+    usuarios.forEach(usuario => {
+
+        tabela.innerHTML += `
+            <tr>
+                <td>${usuario.id}</td>
+                <td>${usuario.nome}</td>
+                <td>${usuario.email}</td>
+            </tr>
+        `;
+    });
+}
+
+</script>
+
+</body>
+</html>
