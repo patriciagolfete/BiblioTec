@@ -60,7 +60,7 @@
                id="livroId"
                placeholder="ID do Livro">
 
-        <button onclick="realizarEmprestimo()">
+        <button onclick="realizarEmprestimos()">
             Realizar Empréstimo
         </button>
 
@@ -97,7 +97,7 @@ const API = "http://localhost:8082/emprestimos";
 
 window.onload = listarEmprestimos;
 
-function realizarEmprestimo() {
+function realizarEmprestimos() {
 
     const usuarioId = document.getElementById("usuarioId").value;
     const livroId = document.getElementById("livroId").value;
@@ -110,7 +110,7 @@ function realizarEmprestimo() {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            dataEmprestimo: hoje,
+            dataEmprestimos: hoje,
             usuario: {
                 id: Number(usuarioId)
             },
@@ -148,16 +148,16 @@ function montarTabela(emprestimos) {
 
     tabela.innerHTML = "";
 
-    emprestimos.forEach(emprestimo => {
+    emprestimos.forEach(emprestimos => {
 
         tabela.innerHTML += `
             <tr>
-                <td>${emprestimo.id}</td>
-                <td>${emprestimo.usuario?.nome ?? ''}</td>
-                <td>${emprestimo.livro?.titulo ?? ''}</td>
-                <td>${emprestimo.dataEmprestimo ?? ''}</td>
+                <td>${emprestimos.id}</td>
+                <td>${emprestimos.usuario?.nome ?? ''}</td>
+                <td>${emprestimos.livro?.titulo ?? ''}</td>
+                <td>${emprestimos.dataEmprestimos ?? ''}</td>
                 <td class="acoes">
-                    <button onclick="devolverLivro(${emprestimo.id})">
+                    <button onclick="devolverLivro(${emprestimos.id})">
                         Devolver
                     </button>
                 </td>
