@@ -45,6 +45,15 @@
         .btn-voltar {
             margin-top: 20px;
         }
+        
+        .erro {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        text-align: left;
+        }
+        
     </style>
 </head>
 <body>
@@ -55,10 +64,13 @@
         <h1>Gerenciar Livros</h1>
 
         <input type="text" id="titulo" placeholder="Título">
+        <div id="erroTitulo" class="erro"></div>
 
         <input type="text" id="autor" placeholder="Autor">
+        <div id="erroAutor" class="erro"></div>
 
         <input type="text" id="editora" placeholder="Editora">
+        <div id="erroEditora" class="erro"></div>
 
         <button onclick="cadastrarLivro()">
             Cadastrar Livro
@@ -100,7 +112,15 @@ const API = "http://localhost:8082/livros";
 
 window.onload = listarLivros;
 
+function limparErros() {
+    document.getElementById("erroTitulo").innerText = "";
+    document.getElementById("erroAutor").innerText = "";
+    document.getElementById("erroEditora").innerText = "";
+}
+
 function cadastrarLivro() {
+
+    limparErros();
 
     const titulo = document.getElementById("titulo").value;
     const autor = document.getElementById("autor").value;
@@ -118,9 +138,31 @@ function cadastrarLivro() {
             disponivel: true
         })
     })
-    .then(() => {
-        limparFormulario();
-        listarLivros();
+    .then(response => {
+
+        if (response.ok) {
+            limparFormulario();
+            listarLivros();
+            return;
+        }
+
+        return response.json().then(erros => {
+
+            if (erros.titulo) {
+                document.getElementById("erroTitulo").innerText =
+                    erros.titulo;
+            }
+
+            if (erros.autor) {
+                document.getElementById("erroAutor").innerText =
+                    erros.autor;
+            }
+
+            if (erros.editora) {
+                document.getElementById("erroEditora").innerText =
+                    erros.editora;
+            }
+        });
     });
 }
 

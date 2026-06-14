@@ -5,6 +5,8 @@ import com.bibliotec.bibliotec_api.repository.AdministradorRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.bibliotec.bibliotec_api.exception.RegraNegocioException;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/administradores")
@@ -19,7 +21,7 @@ public class AdministradorController {
     }
 
     @PostMapping
-    public Administrador salvar(@RequestBody Administrador administrador){
+    public Administrador salvar(@Valid @RequestBody Administrador administrador){
         if (repository.findByLogin(administrador.getLogin()) != null) {
             return null;
         }
@@ -28,10 +30,19 @@ public class AdministradorController {
     }
 
     @PostMapping("/login")
-    public Administrador login(@RequestBody Administrador administrador) {
-        return repository.findByLoginAndSenha(
-                administrador.getLogin(),
-                administrador.getSenha()
-        );
+    public Administrador login(@Valid @RequestBody Administrador administrador) {
+
+        Administrador adm =
+                repository.findByLoginAndSenha(
+                        administrador.getLogin(),
+                        administrador.getSenha());
+
+        if (adm == null) {
+            throw new RegraNegocioException(
+                    "Usuário ou senha inválidos."
+            );
+        }
+
+        return adm;
     }
 }

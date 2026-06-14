@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.bibliotec.bibliotec_api.exception.RegraNegocioException;
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/usuarios")
@@ -27,9 +30,11 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public Usuario salvar(@RequestBody Usuario usuario) {
+    public Usuario salvar(@Valid @RequestBody Usuario usuario) {
         if (repository.findByEmail(usuario.getEmail()) != null) {
-            return null;
+        throw new RegraNegocioException(
+            "Já existe um usuário com este e-mail."
+        );
     }
 
     return repository.save(usuario);
@@ -37,17 +42,26 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     public Usuario buscarPorId(@PathVariable Long id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id)
+            .orElseThrow(() ->
+                    new RegraNegocioException(
+                            "Usuário não encontrado."
+                    ));
     }
 
     @PutMapping("/{id}")
-    public Usuario alterar(@PathVariable Long id, @RequestBody Usuario usuario) {
+    public Usuario alterar(@PathVariable Long id, @Valid @RequestBody Usuario usuario) {
         usuario.setId(id);
         return repository.save(usuario);
     }
 
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id) {
+        if (!repository.existsById(id)) {
+            throw new RegraNegocioException(
+                "Usuário não encontrado."
+            );
+        }
         repository.deleteById(id);
     }
     

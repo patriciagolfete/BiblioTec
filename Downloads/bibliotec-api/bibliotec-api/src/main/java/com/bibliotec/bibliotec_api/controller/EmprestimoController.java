@@ -9,6 +9,8 @@ import com.bibliotec.bibliotec_api.repository.UsuarioRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.bibliotec.bibliotec_api.exception.RegraNegocioException;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/emprestimos")
@@ -29,23 +31,37 @@ public class EmprestimoController {
     }
 
     @PostMapping
-    public Emprestimo salvar(@RequestBody Emprestimo emprestimo) {
+    public Emprestimo salvar(@Valid @RequestBody Emprestimo emprestimo) {
         Long livroId = emprestimo.getLivro().getId();
         Long usuarioId = emprestimo.getUsuario().getId();
 
         Livro livro = livroRepository.findById(livroId).orElse(null);
         Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
 
-        if (livro == null || usuario == null) {
-            return null;
+        if (livro == null) {
+            throw new RegraNegocioException(
+                "Livro não encontrado."
+            );
         }
 
-        if (livro.getDisponivel() == false) {
-            return null;
+        if (usuario == null) {
+            throw new RegraNegocioException(
+                "Usuário não encontrado."
+            );
+        }
+
+        if (!livro.getDisponivel()) {
+            throw new RegraNegocioException(
+                "Livro indisponível para empréstimo."
+            );
         }
         
-        if (usuario.getQntEmprestimos() != null && usuario.getQntEmprestimos() >= 3) {
-            return null;
+        if (usuario.getQntEmprestimos() != null &&
+            usuario.getQntEmprestimos() >= 3) {
+
+            throw new RegraNegocioException(
+                "Usuário já possui 3 empréstimos em aberto."
+            );
         }
 
         livro.setDisponivel(false);
@@ -88,7 +104,9 @@ public class EmprestimoController {
     Emprestimo emprestimo = repository.findById(id).orElse(null);
 
     if (emprestimo == null) {
-        return null;
+        throw new RegraNegocioException(
+            "Empréstimo não encontrado."
+        );
     }
 
     Livro livro = emprestimo.getLivro();

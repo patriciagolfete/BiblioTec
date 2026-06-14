@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.bibliotec.bibliotec_api.exception.RegraNegocioException;
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -31,24 +33,34 @@ public class LivroController {
     }
     
     @PostMapping
-    public Livro salvar(@RequestBody Livro livro){
+    public Livro salvar(@Valid @RequestBody Livro livro){
         return repository.save(livro);
     }
     
     @GetMapping("/{id}")
     public Livro buscarPorId(@PathVariable Long id){
-        return repository.findById(id).orElse(null);
+    return repository.findById(id)
+        .orElseThrow(() ->
+            new RegraNegocioException(
+                "Livro não encontrado."
+                ));    
     }
     
      @PutMapping("/{id}")
-    public Livro alterar(@PathVariable Long id, @RequestBody Livro livro){
+    public Livro alterar(@PathVariable Long id, @Valid @RequestBody Livro livro){
         livro.setId(id);
         return repository.save(livro);
     }
     
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id){
-            repository.deleteById(id);
+        if (!repository.existsById(id)) {
+            throw new RegraNegocioException(
+                "Livro não encontrado."
+            );
+        }
+        
+        repository.deleteById(id);
     }
     
     @GetMapping("/ordenar/autor")
