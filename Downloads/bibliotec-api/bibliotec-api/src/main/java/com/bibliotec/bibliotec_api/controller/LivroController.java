@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.bibliotec.bibliotec_api.exception.RegraNegocioException;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Sort;
+
 
 
 @RestController
@@ -28,8 +31,10 @@ public class LivroController {
     private LivroRepository repository;
     
     @GetMapping
-    public List<Livro> listar(){
-        return repository.findAll();
+    public List<Livro> listar() {
+        return repository.findAll(
+            Sort.by(Sort.Direction.ASC, "titulo")
+        );
     }
     
     @PostMapping
@@ -75,11 +80,47 @@ public class LivroController {
     
     @GetMapping("/disponiveis")
     public List<Livro> listarDisponiveis() {
-        return repository.findByDisponivel(true);
+        return repository.findByDisponivelOrderByTituloAsc(true);
     }
 
     @GetMapping("/emprestados")
     public List<Livro> listarEmprestados() {
         return repository.findByDisponivel(false);
+    }
+    
+    @GetMapping("/buscar/titulo")
+    public List<Livro> buscarPorTitulo(@RequestParam String titulo) {
+
+        List<Livro> livros = repository.findByTituloContainingIgnoreCase(titulo);
+
+        if (livros.isEmpty()) {
+            throw new RegraNegocioException("Livro não encontrado.");
+        }
+
+        return livros;
+    }
+
+    @GetMapping("/buscar/autor")
+    public List<Livro> buscarPorAutor(@RequestParam String autor) {
+
+        List<Livro> livros = repository.findByAutorContainingIgnoreCase(autor);
+
+        if (livros.isEmpty()) {
+            throw new RegraNegocioException("Autor não encontrado.");
+        }
+
+        return livros;
+    }
+
+    @GetMapping("/buscar/editora")
+    public List<Livro> buscarPorEditora(@RequestParam String editora) {
+
+        List<Livro> livros = repository.findByEditoraContainingIgnoreCase(editora);
+
+        if (livros.isEmpty()) {
+            throw new RegraNegocioException("Editora não encontrada.");
+        }
+
+        return livros;
     }
 }

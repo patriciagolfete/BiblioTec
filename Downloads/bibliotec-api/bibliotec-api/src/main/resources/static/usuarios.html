@@ -41,6 +41,15 @@
         .acoes {
             margin-top: 10px;
         }
+        
+        .erro {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        text-align: left;
+        }
+        
     </style>
 </head>
 <body>
@@ -54,10 +63,12 @@
         <input type="text"
                id="nome"
                placeholder="Nome">
+        <div id="erroNome" class="erro"></div>
 
         <input type="email"
                id="email"
-               placeholder="E-mail">
+               placeholder="Email">
+        <div id="erroEmail" class="erro"></div>
 
         <button onclick="cadastrarUsuario()">
             Cadastrar Usuário
@@ -104,10 +115,43 @@ const API = "http://localhost:8082/usuarios";
 
 window.onload = listarUsuarios;
 
+function limparErros() {
+    document.getElementById("erroNome").innerText = "";
+    document.getElementById("erroEmail").innerText = "";
+}
+
 function cadastrarUsuario() {
 
-    const nome = document.getElementById("nome").value;
-    const email = document.getElementById("email").value;
+    limparErros();
+
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    let possuiErro = false;
+
+    // Validação do nome
+    if (!nome) {
+        document.getElementById("erroNome").innerText =
+            "Nome é obrigatório.";
+        possuiErro = true;
+    }
+    else if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nome)) {
+        document.getElementById("erroNome").innerText =
+            "Nome não pode conter números.";
+        possuiErro = true;
+    }
+
+    // Validação do email
+    if (!email) {
+        document.getElementById("erroEmail").innerText =
+            "Email é obrigatório.";
+        possuiErro = true;
+    }
+
+    // Se houver erro, não envia para a API
+    if (possuiErro) {
+        return;
+    }
 
     fetch(API, {
         method: "POST",
@@ -119,13 +163,21 @@ function cadastrarUsuario() {
             email: email
         })
     })
-    .then(response => response.json())
-    .then(() => {
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao cadastrar usuário.");
+        }
 
+        return response.json();
+    })
+    .then(() => {
         document.getElementById("nome").value = "";
         document.getElementById("email").value = "";
 
         listarUsuarios();
+    })
+    .catch(error => {
+        console.error(error);
     });
 }
 

@@ -75,6 +75,22 @@
         <button onclick="cadastrarLivro()">
             Cadastrar Livro
         </button>
+        
+        <hr>
+
+        <input type="text"
+               id="buscaLivro"
+               placeholder="Pesquisar livro">
+
+        <select id="tipoBusca">
+            <option value="titulo">Título</option>
+            <option value="autor">Autor</option>
+            <option value="editora">Editora</option>
+        </select>
+
+        <button onclick="buscarLivro()">
+            Buscar
+        </button>
 
         <button onclick="listarLivros()">
             Listar Todos
@@ -82,6 +98,10 @@
 
         <button onclick="listarDisponiveis()">
             Livros Disponíveis
+        </button>
+        
+        <button onclick="listarEmprestados()">
+            Livros Emprestados
         </button>
 
         <button class="btn-voltar"
@@ -166,30 +186,79 @@ function cadastrarLivro() {
     });
 }
 
+function buscarLivro() {
+
+    const texto = document.getElementById("buscaLivro").value;
+    const tipo = document.getElementById("tipoBusca").value;
+
+    if (!texto) {
+        listarLivros();
+        return;
+    }
+
+    fetch(
+        API +
+        "/buscar/" +
+        tipo +
+        "?" +
+        tipo +
+        "=" +
+        encodeURIComponent(texto)
+    )
+    .then(response => {
+
+        if (!response.ok) {
+            return response.json().then(erro => {
+
+                let mensagem = "";
+
+                if (tipo === "titulo") {
+                    mensagem = "Livro não encontrado.";
+                } else if (tipo === "autor") {
+                    mensagem = "Autor não encontrado.";
+                } else if (tipo === "editora") {
+                    mensagem = "Editora não encontrada.";
+                }
+
+                montarMensagemNaoEncontrado(mensagem);
+            });
+        }
+
+        return response.json().then(livros => montarTabela(livros));
+    });
+}
+
 function listarLivros() {
 
     fetch(API)
         .then(response => response.json())
-        .then(dados => montarTabela(dados));
+        .then(dados => {
+            dados.sort((a, b) =>
+                a.titulo.localeCompare(b.titulo, 'pt-BR')
+            );
+
+            montarTabela(dados);
+        });
 }
 
 function listarDisponiveis() {
 
     fetch(API + "/disponiveis")
         .then(response => response.json())
-        .then(dados => montarTabela(dados));
+        .then(dados => {
+            dados.sort((a, b) =>
+                a.titulo.localeCompare(b.titulo, 'pt-BR')
+            );
+
+            montarTabela(dados);
+        });
 }
 
-function excluirLivro(id) {
+function listarEmprestados() {
 
-    if (!confirm("Deseja excluir este livro?")) {
-        return;
-    }
-
-    fetch(API + "/" + id, {
-        method: "DELETE"
-    })
-    .then(() => listarLivros());
+    fetch(API + "/emprestados")
+        .then(response => response.json())
+        .then(dados => montarTabela(dados));
 }
 
 function montarTabela(livros) {
@@ -215,6 +284,31 @@ function montarTabela(livros) {
             </tr>
         `;
     });
+}
+
+function excluirLivro(id) {
+
+    if (!confirm("Deseja excluir este livro?")) {
+        return;
+    }
+
+    fetch(API + "/" + id, {
+        method: "DELETE"
+    })
+    .then(() => listarLivros());
+}
+
+function montarMensagemNaoEncontrado(mensagem) {
+
+    const tabela = document.getElementById("tabelaLivros");
+
+    tabela.innerHTML = `
+        <tr>
+            <td colspan="6" style="color: red; font-weight: bold;">
+                ${mensagem}
+            </td>
+        </tr>
+    `;
 }
 
 function limparFormulario() {

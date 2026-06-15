@@ -10,5 +10,15 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
 
     List<Livro> findAllByOrderByEditoraAsc();
 
+    List<Livro> findAllByOrderByTituloAsc();
+
     List<Livro> findByDisponivel(Boolean disponivel);
+
+    List<Livro> findByDisponivelOrderByTituloAsc(Boolean disponivel);
+
+    List<Livro> findByTituloContainingIgnoreCase(String titulo);
+
+    List<Livro> findByAutorContainingIgnoreCase(String autor);
+
+    List<Livro> findByEditoraContainingIgnoreCase(String editora);
 }
