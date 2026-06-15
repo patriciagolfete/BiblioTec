@@ -26,7 +26,7 @@ public class UsuarioController {
 
     @GetMapping
     public List<Usuario> listar() {
-        return repository.findAll();
+        return repository.findAllByOrderByNomeAsc();
     }
 
     @PostMapping
@@ -67,6 +67,16 @@ public class UsuarioController {
     
     @GetMapping("/buscar")
     public List<Usuario> buscarPorNome(@RequestParam String nome) {
-        return repository.findByNomeContainingIgnoreCase(nome);
-}
+
+        List<Usuario> usuarios =
+                repository.findByNomeContainingIgnoreCase(nome);
+
+        if (usuarios.isEmpty()) {
+            throw new RegraNegocioException(
+                    "Usuário não encontrado."
+            );
+        }
+
+        return usuarios;
+    }
 }

@@ -192,9 +192,41 @@ function buscarUsuario() {
 
     const nome = document.getElementById("buscaNome").value;
 
+    if (!nome) {
+        listarUsuarios();
+        return;
+    }
+
     fetch(API + "/buscar?nome=" + encodeURIComponent(nome))
-        .then(response => response.json())
-        .then(usuarios => montarTabela(usuarios));
+        .then(response => {
+
+            if (!response.ok) {
+                montarMensagemNaoEncontrado(
+                    "Usuário não encontrado."
+                );
+                return;
+            }
+
+            return response.json();
+        })
+        .then(usuarios => {
+            if (usuarios) {
+                montarTabela(usuarios);
+            }
+        });
+}
+
+function montarMensagemNaoEncontrado(mensagem) {
+
+    const tabela = document.getElementById("tabelaUsuarios");
+
+    tabela.innerHTML = `
+        <tr>
+            <td colspan="6" style="color: red; font-weight: bold;">
+                ${mensagem}
+            </td>
+        </tr>
+    `;
 }
 
 function montarTabela(usuarios) {
