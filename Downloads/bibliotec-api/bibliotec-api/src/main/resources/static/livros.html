@@ -54,6 +54,20 @@
         text-align: left;
         }
         
+        #mensagem {
+        margin-top: 15px;
+        font-weight: bold;
+        text-align: center;
+        }
+
+        .sucesso {
+        color: green;
+        }
+
+        .erro-geral {
+        color: red;
+        }
+        
     </style>
 </head>
 <body>
@@ -108,6 +122,9 @@
                 onclick="window.location.href='/dashboard.html'">
             Voltar
         </button>
+        
+        <div id="mensagem"></div>
+        
     </div>
 
     <table>
@@ -161,11 +178,17 @@ function cadastrarLivro() {
     .then(response => {
 
         if (response.ok) {
+            document.getElementById("mensagem").innerText =
+            "Livro cadastrado com sucesso.";
+
+            document.getElementById("mensagem").className =
+            "sucesso";
+
             limparFormulario();
             listarLivros();
+
             return;
         }
-
         return response.json().then(erros => {
 
             if (erros.titulo) {
@@ -295,7 +318,16 @@ function excluirLivro(id) {
     fetch(API + "/" + id, {
         method: "DELETE"
     })
-    .then(() => listarLivros());
+    .then(() => {
+
+    document.getElementById("mensagem").innerText =
+        "Livro excluído com sucesso.";
+
+    document.getElementById("mensagem").className =
+        "sucesso";
+
+    listarLivros();
+});
 }
 
 function montarMensagemNaoEncontrado(mensagem) {
