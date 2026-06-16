@@ -139,16 +139,20 @@ const API = "http://localhost:8082/livros";
 
 window.onload = listarLivros;
 
+let livrosCarregados = [];
+
 function limparErros() {
     document.getElementById("erroTitulo").innerText = "";
     document.getElementById("erroAutor").innerText = "";
     document.getElementById("erroEditora").innerText = "";
 }
 
-function mostrarMensagem(texto, tipo) {
+function mostrarMensagem(texto, sucesso = true) {
     const mensagem = document.getElementById("mensagem");
+
     mensagem.innerText = texto;
-    mensagem.className = tipo;
+    mensagem.style.color = sucesso ? "green" : "red";
+    mensagem.style.fontWeight = "bold";
 }
 
 function validarCampos() {
@@ -161,17 +165,20 @@ function validarCampos() {
     let possuiErro = false;
 
     if (!titulo) {
-        document.getElementById("erroTitulo").innerText = "Título é obrigatório.";
+        document.getElementById("erroTitulo").innerText =
+            "Título é obrigatório.";
         possuiErro = true;
     }
 
     if (!autor) {
-        document.getElementById("erroAutor").innerText = "Autor é obrigatório.";
+        document.getElementById("erroAutor").innerText =
+            "Autor é obrigatório.";
         possuiErro = true;
     }
 
     if (!editora) {
-        document.getElementById("erroEditora").innerText = "Editora é obrigatória.";
+        document.getElementById("erroEditora").innerText =
+            "Editora é obrigatória.";
         possuiErro = true;
     }
 
@@ -179,7 +186,7 @@ function validarCampos() {
 }
 
 function cadastrarLivro() {
-    mostrarMensagem("", "");
+    mostrarMensagem("");
 
     if (!validarCampos()) {
         return;
@@ -209,30 +216,37 @@ function cadastrarLivro() {
     })
     .then(() => {
         limparFormulario();
-        mostrarMensagem("Livro cadastrado com sucesso.", "sucesso");
+        mostrarMensagem("Livro cadastrado com sucesso!", true);
         listarLivros();
     })
     .catch(() => {
-        mostrarMensagem("Erro ao cadastrar livro.", "erro-geral");
+        mostrarMensagem("Erro ao cadastrar livro.", false);
     });
 }
 
-function prepararEdicao(id, titulo, autor, editora, disponivel) {
-    document.getElementById("idLivro").value = id;
-    document.getElementById("titulo").value = titulo;
-    document.getElementById("autor").value = autor;
-    document.getElementById("editora").value = editora;
-    document.getElementById("disponivelLivro").value = disponivel;
+function prepararEdicaoPorId(id) {
+    const livro = livrosCarregados.find(l => l.id === id);
+
+    if (!livro) {
+        mostrarMensagem("Livro não encontrado para edição.", false);
+        return;
+    }
+
+    document.getElementById("idLivro").value = livro.id;
+    document.getElementById("titulo").value = livro.titulo;
+    document.getElementById("autor").value = livro.autor;
+    document.getElementById("editora").value = livro.editora;
+    document.getElementById("disponivelLivro").value = livro.disponivel;
 
     document.getElementById("btnCadastrar").style.display = "none";
     document.getElementById("btnAlterar").style.display = "inline-block";
 
     limparErros();
-    mostrarMensagem("", "");
+    mostrarMensagem("");
 }
 
 function alterarLivro() {
-    mostrarMensagem("", "");
+    mostrarMensagem("");
 
     if (!validarCampos()) {
         return;
@@ -242,7 +256,8 @@ function alterarLivro() {
     const titulo = document.getElementById("titulo").value.trim();
     const autor = document.getElementById("autor").value.trim();
     const editora = document.getElementById("editora").value.trim();
-    const disponivel = document.getElementById("disponivelLivro").value === "true";
+    const disponivel =
+        document.getElementById("disponivelLivro").value === "true";
 
     fetch(API + "/" + id, {
         method: "PUT",
@@ -264,11 +279,11 @@ function alterarLivro() {
     })
     .then(() => {
         limparFormulario();
-        mostrarMensagem("Livro alterado com sucesso.", "sucesso");
+        mostrarMensagem("Livro alterado com sucesso!", true);
         listarLivros();
     })
     .catch(() => {
-        mostrarMensagem("Erro ao alterar livro.", "erro-geral");
+        mostrarMensagem("Erro ao alterar livro.", false);
     });
 }
 
@@ -287,17 +302,19 @@ function excluirLivro(id) {
     })
     .then(() => {
         limparFormulario();
-        mostrarMensagem("Livro excluído com sucesso.", "sucesso");
+        mostrarMensagem("Livro excluído com sucesso!", true);
         listarLivros();
     })
     .catch(() => {
-        mostrarMensagem("Erro ao excluir livro.", "erro-geral");
+        mostrarMensagem("Erro ao excluir livro.", false);
     });
 }
 
 function buscarLivro() {
     const texto = document.getElementById("buscaLivro").value.trim();
     const tipo = document.getElementById("tipoBusca").value;
+
+    mostrarMensagem("");
 
     if (!texto) {
         listarLivros();
@@ -334,7 +351,10 @@ function listarLivros() {
     fetch(API)
         .then(response => response.json())
         .then(dados => {
-            dados.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+            dados.sort((a, b) =>
+                a.titulo.localeCompare(b.titulo, "pt-BR")
+            );
+
             montarTabela(dados);
         });
 }
@@ -343,7 +363,10 @@ function listarDisponiveis() {
     fetch(API + "/disponiveis")
         .then(response => response.json())
         .then(dados => {
-            dados.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+            dados.sort((a, b) =>
+                a.titulo.localeCompare(b.titulo, "pt-BR")
+            );
+
             montarTabela(dados);
         });
 }
@@ -352,13 +375,18 @@ function listarEmprestados() {
     fetch(API + "/emprestados")
         .then(response => response.json())
         .then(dados => {
-            dados.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+            dados.sort((a, b) =>
+                a.titulo.localeCompare(b.titulo, "pt-BR")
+            );
+
             montarTabela(dados);
         });
 }
 
 function montarTabela(livros) {
     const tabela = document.getElementById("tabelaLivros");
+
+    livrosCarregados = livros;
     tabela.innerHTML = "";
 
     livros.forEach(livro => {
@@ -368,15 +396,9 @@ function montarTabela(livros) {
                 <td>${livro.titulo}</td>
                 <td>${livro.autor}</td>
                 <td>${livro.editora}</td>
-                <td>${livro.disponivel ? 'Sim' : 'Não'}</td>
+                <td>${livro.disponivel ? "Sim" : "Não"}</td>
                 <td>
-                    <button onclick="prepararEdicao(
-                        ${livro.id},
-                        '${livro.titulo}',
-                        '${livro.autor}',
-                        '${livro.editora}',
-                        ${livro.disponivel}
-                    )">
+                    <button onclick="prepararEdicaoPorId(${livro.id})">
                         Editar
                     </button>
 
