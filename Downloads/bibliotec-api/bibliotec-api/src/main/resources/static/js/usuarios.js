@@ -1,0 +1,247 @@
+const API = "http://localhost:8082/usuarios";
+
+window.onload = listarUsuarios;
+
+function limparErros() {
+    document.getElementById("erroNome").innerText = "";
+    document.getElementById("erroEmail").innerText = "";
+}
+
+function mostrarMensagem(texto, sucesso = true) {
+    const mensagem = document.getElementById("mensagem");
+
+    mensagem.innerText = texto;
+    mensagem.style.color = sucesso ? "green" : "red";
+    mensagem.style.fontWeight = "bold";
+}
+
+function validarCampos() {
+
+    limparErros();
+
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    let possuiErro = false;
+
+    if (!nome) {
+        document.getElementById("erroNome").innerText =
+            "Nome é obrigatório.";
+        possuiErro = true;
+    } else if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nome)) {
+        document.getElementById("erroNome").innerText =
+            "Nome não pode conter números.";
+        possuiErro = true;
+    }
+
+    if (!email) {
+        document.getElementById("erroEmail").innerText =
+            "Email é obrigatório.";
+        possuiErro = true;
+    }
+
+    return !possuiErro;
+}
+
+function cadastrarUsuario() {
+
+    mostrarMensagem("");
+
+    if (!validarCampos()) {
+        return;
+    }
+
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    fetch(API, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            nome: nome,
+            email: email,
+            qntEmprestimos: 0
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao cadastrar usuário.");
+        }
+
+        return response.json();
+    })
+    .then(() => {
+        limparFormulario();
+        mostrarMensagem("Usuário cadastrado com sucesso!", true);
+        listarUsuarios();
+    })
+    .catch(() => {
+        document.getElementById("erroEmail").innerText =
+            "Já existe um usuário com este e-mail.";
+    });
+}
+
+function prepararEdicao(id, nome, email) {
+
+    document.getElementById("idUsuario").value = id;
+    document.getElementById("nome").value = nome;
+    document.getElementById("email").value = email;
+
+    document.getElementById("btnCadastrar").style.display = "none";
+    document.getElementById("btnAlterar").style.display = "inline-block";
+
+    mostrarMensagem("");
+    limparErros();
+}
+
+function alterarUsuario() {
+
+    mostrarMensagem("");
+
+    if (!validarCampos()) {
+        return;
+    }
+
+    const id = document.getElementById("idUsuario").value;
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    fetch(API + "/" + id, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            nome: nome,
+            email: email,
+            qntEmprestimos: 0
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao alterar usuário.");
+        }
+
+        return response.json();
+    })
+    .then(() => {
+        limparFormulario();
+        mostrarMensagem("Usuário alterado com sucesso!", true);
+        listarUsuarios();
+    })
+    .catch(() => {
+        mostrarMensagem("Erro ao alterar usuário.", false);
+    });
+}
+
+function excluirUsuario(id) {
+
+    if (!confirm("Deseja excluir este usuário?")) {
+        return;
+    }
+
+    fetch(API + "/" + id, {
+        method: "DELETE"
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao excluir usuário.");
+        }
+    })
+    .then(() => {
+        limparFormulario();
+        mostrarMensagem("Usuário excluído com sucesso!", true);
+        listarUsuarios();
+    })
+    .catch(() => {
+        mostrarMensagem("Erro ao excluir usuário.", false);
+    });
+}
+
+function listarUsuarios() {
+
+    fetch(API)
+        .then(response => response.json())
+        .then(usuarios => montarTabela(usuarios));
+}
+
+function buscarUsuario() {
+
+    const nome = document.getElementById("buscaNome").value.trim();
+
+    if (!nome) {
+        listarUsuarios();
+        return;
+    }
+
+    fetch(API + "/buscar?nome=" + encodeURIComponent(nome))
+        .then(response => {
+
+            if (!response.ok) {
+                montarMensagemNaoEncontrado("Usuário não encontrado.");
+                return;
+            }
+
+            return response.json();
+        })
+        .then(usuarios => {
+            if (usuarios) {
+                montarTabela(usuarios);
+            }
+        });
+}
+
+function montarMensagemNaoEncontrado(mensagem) {
+
+    const tabela = document.getElementById("tabelaUsuarios");
+
+    tabela.innerHTML = `
+        <tr>
+            <td colspan="4" style="color: red; font-weight: bold;">
+                ${mensagem}
+            </td>
+        </tr>
+    `;
+}
+
+function montarTabela(usuarios) {
+
+    const tabela = document.getElementById("tabelaUsuarios");
+
+    tabela.innerHTML = "";
+
+    usuarios.forEach(usuario => {
+
+        tabela.innerHTML += `
+            <tr>
+                <td>${usuario.id}</td>
+                <td>${usuario.nome}</td>
+                <td>${usuario.email}</td>
+                <td>
+                    <button onclick="prepararEdicao(${usuario.id}, '${usuario.nome}', '${usuario.email}')">
+                        Editar
+                    </button>
+
+                    <button onclick="excluirUsuario(${usuario.id})">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+function limparFormulario() {
+
+    document.getElementById("idUsuario").value = "";
+    document.getElementById("nome").value = "";
+    document.getElementById("email").value = "";
+
+    document.getElementById("btnCadastrar").style.display = "inline-block";
+    document.getElementById("btnAlterar").style.display = "none";
+
+    limparErros();
+}
+
