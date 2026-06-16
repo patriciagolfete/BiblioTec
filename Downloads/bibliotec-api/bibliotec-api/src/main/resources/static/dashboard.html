@@ -3,21 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard - BiblioTec</title>
+
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
 
     <div class="container">
         <div class="login-card">
+
             <h1>BiblioTec</h1>
+
             <p>Menu principal</p>
 
-            <button onclick="window.location.href='/livros.html'">Gerenciar Livros</button>
-            <button onclick="window.location.href='/usuarios.html'">Gerenciar Usuários</button>
-            <button onclick="window.location.href='/emprestimos.html'">Empréstimos</button>
-            <button onclick="window.location.href='/login.html'">Sair</button>
+            <button onclick="abrirLivros()">
+                Gerenciar Livros
+            </button>
+
+            <button onclick="abrirUsuarios()">
+                Gerenciar Usuários
+            </button>
+
+            <button onclick="abrirEmprestimos()">
+                Empréstimos
+            </button>
+
+            <button onclick="sair()">
+                Sair
+            </button>
+
         </div>
     </div>
+
+    <script src="/js/dashboard.js"></script>
 
 </body>
 </html>

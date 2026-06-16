@@ -1,0 +1,43 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.home-card {
+    background: white;
+    padding: 30px;
+    width: 500px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    width: 150px;
+    margin-bottom: 20px;
+}
+
+.home-card h1 {
+    margin-bottom: 15px;
+}
+
+.home-card p {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.utfpr {
+    font-size: 14px;
+    color: #666;
+}
+
