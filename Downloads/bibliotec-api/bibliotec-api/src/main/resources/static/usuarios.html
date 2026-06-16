@@ -38,18 +38,20 @@
             border-radius: 10px;
         }
 
-        .acoes {
-            margin-top: 10px;
-        }
-        
         .erro {
-        color: red;
-        font-size: 14px;
-        margin-top: 5px;
-        margin-bottom: 10px;
-        text-align: left;
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            text-align: left;
         }
-        
+
+        .mensagem {
+            color: green;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -60,25 +62,31 @@
 
         <h1>Gerenciar Usuários</h1>
 
-        <input type="text"
-               id="nome"
-               placeholder="Nome">
+        <input type="hidden" id="idUsuario">
+
+        <input type="text" id="nome" placeholder="Nome">
         <div id="erroNome" class="erro"></div>
 
-        <input type="email"
-               id="email"
-               placeholder="Email">
+        <input type="email" id="email" placeholder="Email">
         <div id="erroEmail" class="erro"></div>
 
-        <button onclick="cadastrarUsuario()">
+        <div id="mensagem" class="mensagem"></div>
+
+        <button id="btnCadastrar" onclick="cadastrarUsuario()">
             Cadastrar Usuário
+        </button>
+
+        <button id="btnAlterar" onclick="alterarUsuario()" style="display:none;">
+            Alterar Usuário
+        </button>
+
+        <button onclick="limparFormulario()">
+            Limpar
         </button>
 
         <hr>
 
-        <input type="text"
-               id="buscaNome"
-               placeholder="Buscar por nome">
+        <input type="text" id="buscaNome" placeholder="Buscar por nome">
 
         <button onclick="buscarUsuario()">
             Buscar
@@ -100,11 +108,11 @@
             <th>ID</th>
             <th>Nome</th>
             <th>E-mail</th>
+            <th>Ações</th>
         </tr>
         </thead>
 
         <tbody id="tabelaUsuarios"></tbody>
-
     </table>
 
 </div>
@@ -120,7 +128,11 @@ function limparErros() {
     document.getElementById("erroEmail").innerText = "";
 }
 
-function cadastrarUsuario() {
+function mostrarMensagem(texto) {
+    document.getElementById("mensagem").innerText = texto;
+}
+
+function validarCampos() {
 
     limparErros();
 
@@ -129,29 +141,32 @@ function cadastrarUsuario() {
 
     let possuiErro = false;
 
-    // Validação do nome
     if (!nome) {
-        document.getElementById("erroNome").innerText =
-            "Nome é obrigatório.";
+        document.getElementById("erroNome").innerText = "Nome é obrigatório.";
         possuiErro = true;
-    }
-    else if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nome)) {
-        document.getElementById("erroNome").innerText =
-            "Nome não pode conter números.";
+    } else if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nome)) {
+        document.getElementById("erroNome").innerText = "Nome não pode conter números.";
         possuiErro = true;
     }
 
-    // Validação do email
     if (!email) {
-        document.getElementById("erroEmail").innerText =
-            "Email é obrigatório.";
+        document.getElementById("erroEmail").innerText = "Email é obrigatório.";
         possuiErro = true;
     }
 
-    // Se houver erro, não envia para a API
-    if (possuiErro) {
+    return !possuiErro;
+}
+
+function cadastrarUsuario() {
+
+    mostrarMensagem("");
+
+    if (!validarCampos()) {
         return;
     }
+
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
 
     fetch(API, {
         method: "POST",
@@ -160,7 +175,8 @@ function cadastrarUsuario() {
         },
         body: JSON.stringify({
             nome: nome,
-            email: email
+            email: email,
+            qntEmprestimos: 0
         })
     })
     .then(response => {
@@ -171,13 +187,88 @@ function cadastrarUsuario() {
         return response.json();
     })
     .then(() => {
-        document.getElementById("nome").value = "";
-        document.getElementById("email").value = "";
-
+        limparFormulario();
+        mostrarMensagem("Usuário cadastrado com sucesso.");
         listarUsuarios();
     })
-    .catch(error => {
-        console.error(error);
+    .catch(() => {
+        document.getElementById("erroEmail").innerText =
+            "Já existe um usuário com este e-mail.";
+    });
+}
+
+function prepararEdicao(id, nome, email) {
+
+    document.getElementById("idUsuario").value = id;
+    document.getElementById("nome").value = nome;
+    document.getElementById("email").value = email;
+
+    document.getElementById("btnCadastrar").style.display = "none";
+    document.getElementById("btnAlterar").style.display = "inline-block";
+
+    mostrarMensagem("");
+    limparErros();
+}
+
+function alterarUsuario() {
+
+    mostrarMensagem("");
+
+    if (!validarCampos()) {
+        return;
+    }
+
+    const id = document.getElementById("idUsuario").value;
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    fetch(API + "/" + id, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            nome: nome,
+            email: email,
+            qntEmprestimos: 0
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao alterar usuário.");
+        }
+
+        return response.json();
+    })
+    .then(() => {
+        limparFormulario();
+        mostrarMensagem("Usuário alterado com sucesso.");
+        listarUsuarios();
+    })
+    .catch(() => {
+        document.getElementById("erroEmail").innerText =
+            "Erro ao alterar usuário.";
+    });
+}
+
+function excluirUsuario(id) {
+
+    if (!confirm("Deseja excluir este usuário?")) {
+        return;
+    }
+
+    fetch(API + "/" + id, {
+        method: "DELETE"
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao excluir usuário.");
+        }
+    })
+    .then(() => {
+        limparFormulario();
+        mostrarMensagem("Usuário excluído com sucesso.");
+        listarUsuarios();
     });
 }
 
@@ -201,9 +292,7 @@ function buscarUsuario() {
         .then(response => {
 
             if (!response.ok) {
-                montarMensagemNaoEncontrado(
-                    "Usuário não encontrado."
-                );
+                montarMensagemNaoEncontrado("Usuário não encontrado.");
                 return;
             }
 
@@ -222,7 +311,7 @@ function montarMensagemNaoEncontrado(mensagem) {
 
     tabela.innerHTML = `
         <tr>
-            <td colspan="6" style="color: red; font-weight: bold;">
+            <td colspan="4" style="color: red; font-weight: bold;">
                 ${mensagem}
             </td>
         </tr>
@@ -242,9 +331,30 @@ function montarTabela(usuarios) {
                 <td>${usuario.id}</td>
                 <td>${usuario.nome}</td>
                 <td>${usuario.email}</td>
+                <td>
+                    <button onclick="prepararEdicao(${usuario.id}, '${usuario.nome}', '${usuario.email}')">
+                        Editar
+                    </button>
+
+                    <button onclick="excluirUsuario(${usuario.id})">
+                        Excluir
+                    </button>
+                </td>
             </tr>
         `;
     });
+}
+
+function limparFormulario() {
+
+    document.getElementById("idUsuario").value = "";
+    document.getElementById("nome").value = "";
+    document.getElementById("email").value = "";
+
+    document.getElementById("btnCadastrar").style.display = "inline-block";
+    document.getElementById("btnAlterar").style.display = "none";
+
+    limparErros();
 }
 
 </script>
