@@ -53,3 +53,13 @@ button:hover {
     margin-top: 15px;
     color: red;
 }
+
+#mensagem {
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.sucesso {
+    color: green;
+}

@@ -95,6 +95,8 @@
         <button onclick="window.location.href='/dashboard.html'">
             Voltar
         </button>
+    
+        <div id="mensagem"></div>
 
     </div>
 
@@ -195,6 +197,11 @@ function realizarEmprestimo() {
                 document.getElementById("erroLivro")
                     .innerText = "Livro não encontrado.";
             }
+            if (mensagem.includes("Livro indisponível")) {
+                document.getElementById("erroLivro")
+                    .innerText =
+                    "Livro indisponível! Não é possível realizar o empréstimo.";
+            }
 
             throw new Error(mensagem);
         });
@@ -202,8 +209,12 @@ function realizarEmprestimo() {
     .then(() => {
         document.getElementById("usuarioId").value = "";
         document.getElementById("livroId").value = "";
+
+        mostrarMensagem("Empréstimo realizado com sucesso!");
+
         listarEmprestimos();
     });
+    
 }
 
 function listarEmprestimos() {
@@ -243,6 +254,14 @@ function montarTabela(emprestimos) {
             </tr>
         `;
     });
+}
+
+function mostrarMensagem(texto) {
+    const mensagem = document.getElementById("mensagem");
+
+    mensagem.innerText = texto;
+    mensagem.style.color = "green";
+    mensagem.style.fontWeight = "bold";
 }
 
 </script>

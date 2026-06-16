@@ -46,11 +46,11 @@
             text-align: left;
         }
 
-        .mensagem {
-            color: green;
-            font-weight: bold;
+        #mensagem {
             margin-top: 10px;
             margin-bottom: 10px;
+            font-weight: bold;
+            text-align: center;
         }
     </style>
 </head>
@@ -70,7 +70,7 @@
         <input type="email" id="email" placeholder="Email">
         <div id="erroEmail" class="erro"></div>
 
-        <div id="mensagem" class="mensagem"></div>
+        <div id="mensagem"></div>
 
         <button id="btnCadastrar" onclick="cadastrarUsuario()">
             Cadastrar Usuário
@@ -88,13 +88,9 @@
 
         <input type="text" id="buscaNome" placeholder="Buscar por nome">
 
-        <button onclick="buscarUsuario()">
-            Buscar
-        </button>
+        <button onclick="buscarUsuario()">Buscar</button>
 
-        <button onclick="listarUsuarios()">
-            Listar Todos
-        </button>
+        <button onclick="listarUsuarios()">Listar Todos</button>
 
         <button onclick="window.location.href='/dashboard.html'">
             Voltar
@@ -128,8 +124,12 @@ function limparErros() {
     document.getElementById("erroEmail").innerText = "";
 }
 
-function mostrarMensagem(texto) {
-    document.getElementById("mensagem").innerText = texto;
+function mostrarMensagem(texto, sucesso = true) {
+    const mensagem = document.getElementById("mensagem");
+
+    mensagem.innerText = texto;
+    mensagem.style.color = sucesso ? "green" : "red";
+    mensagem.style.fontWeight = "bold";
 }
 
 function validarCampos() {
@@ -142,15 +142,18 @@ function validarCampos() {
     let possuiErro = false;
 
     if (!nome) {
-        document.getElementById("erroNome").innerText = "Nome é obrigatório.";
+        document.getElementById("erroNome").innerText =
+            "Nome é obrigatório.";
         possuiErro = true;
     } else if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nome)) {
-        document.getElementById("erroNome").innerText = "Nome não pode conter números.";
+        document.getElementById("erroNome").innerText =
+            "Nome não pode conter números.";
         possuiErro = true;
     }
 
     if (!email) {
-        document.getElementById("erroEmail").innerText = "Email é obrigatório.";
+        document.getElementById("erroEmail").innerText =
+            "Email é obrigatório.";
         possuiErro = true;
     }
 
@@ -188,7 +191,7 @@ function cadastrarUsuario() {
     })
     .then(() => {
         limparFormulario();
-        mostrarMensagem("Usuário cadastrado com sucesso.");
+        mostrarMensagem("Usuário cadastrado com sucesso!", true);
         listarUsuarios();
     })
     .catch(() => {
@@ -242,12 +245,11 @@ function alterarUsuario() {
     })
     .then(() => {
         limparFormulario();
-        mostrarMensagem("Usuário alterado com sucesso.");
+        mostrarMensagem("Usuário alterado com sucesso!", true);
         listarUsuarios();
     })
     .catch(() => {
-        document.getElementById("erroEmail").innerText =
-            "Erro ao alterar usuário.";
+        mostrarMensagem("Erro ao alterar usuário.", false);
     });
 }
 
@@ -267,8 +269,11 @@ function excluirUsuario(id) {
     })
     .then(() => {
         limparFormulario();
-        mostrarMensagem("Usuário excluído com sucesso.");
+        mostrarMensagem("Usuário excluído com sucesso!", true);
         listarUsuarios();
+    })
+    .catch(() => {
+        mostrarMensagem("Erro ao excluir usuário.", false);
     });
 }
 
@@ -281,7 +286,7 @@ function listarUsuarios() {
 
 function buscarUsuario() {
 
-    const nome = document.getElementById("buscaNome").value;
+    const nome = document.getElementById("buscaNome").value.trim();
 
     if (!nome) {
         listarUsuarios();
