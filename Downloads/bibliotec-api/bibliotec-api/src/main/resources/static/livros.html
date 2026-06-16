@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Livros - BiblioTec</title>
     <link rel="stylesheet" href="/css/style.css">
+
     <style>
         table {
             width: 100%;
@@ -24,12 +25,6 @@
             color: white;
         }
 
-        .acoes {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-        }
-
         .container-livros {
             width: 90%;
             max-width: 1000px;
@@ -45,29 +40,28 @@
         .btn-voltar {
             margin-top: 20px;
         }
-        
+
         .erro {
-        color: red;
-        font-size: 14px;
-        margin-top: 5px;
-        margin-bottom: 10px;
-        text-align: left;
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            text-align: left;
         }
-        
+
         #mensagem {
-        margin-top: 15px;
-        font-weight: bold;
-        text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
         }
 
         .sucesso {
-        color: green;
+            color: green;
         }
 
         .erro-geral {
-        color: red;
+            color: red;
         }
-        
     </style>
 </head>
 <body>
@@ -76,6 +70,9 @@
 
     <div class="formulario">
         <h1>Gerenciar Livros</h1>
+
+        <input type="hidden" id="idLivro">
+        <input type="hidden" id="disponivelLivro">
 
         <input type="text" id="titulo" placeholder="Título">
         <div id="erroTitulo" class="erro"></div>
@@ -86,15 +83,21 @@
         <input type="text" id="editora" placeholder="Editora">
         <div id="erroEditora" class="erro"></div>
 
-        <button onclick="cadastrarLivro()">
+        <button id="btnCadastrar" onclick="cadastrarLivro()">
             Cadastrar Livro
         </button>
-        
+
+        <button id="btnAlterar" onclick="alterarLivro()" style="display:none;">
+            Alterar Livro
+        </button>
+
+        <button onclick="limparFormulario()">
+            Limpar
+        </button>
+
         <hr>
 
-        <input type="text"
-               id="buscaLivro"
-               placeholder="Pesquisar livro">
+        <input type="text" id="buscaLivro" placeholder="Pesquisar livro">
 
         <select id="tipoBusca">
             <option value="titulo">Título</option>
@@ -102,29 +105,16 @@
             <option value="editora">Editora</option>
         </select>
 
-        <button onclick="buscarLivro()">
-            Buscar
-        </button>
+        <button onclick="buscarLivro()">Buscar</button>
+        <button onclick="listarLivros()">Listar Todos</button>
+        <button onclick="listarDisponiveis()">Livros Disponíveis</button>
+        <button onclick="listarEmprestados()">Livros Emprestados</button>
 
-        <button onclick="listarLivros()">
-            Listar Todos
-        </button>
-
-        <button onclick="listarDisponiveis()">
-            Livros Disponíveis
-        </button>
-        
-        <button onclick="listarEmprestados()">
-            Livros Emprestados
-        </button>
-
-        <button class="btn-voltar"
-                onclick="window.location.href='/dashboard.html'">
+        <button class="btn-voltar" onclick="window.location.href='/dashboard.html'">
             Voltar
         </button>
-        
+
         <div id="mensagem"></div>
-        
     </div>
 
     <table>
@@ -155,13 +145,49 @@ function limparErros() {
     document.getElementById("erroEditora").innerText = "";
 }
 
-function cadastrarLivro() {
+function mostrarMensagem(texto, tipo) {
+    const mensagem = document.getElementById("mensagem");
+    mensagem.innerText = texto;
+    mensagem.className = tipo;
+}
 
+function validarCampos() {
     limparErros();
 
-    const titulo = document.getElementById("titulo").value;
-    const autor = document.getElementById("autor").value;
-    const editora = document.getElementById("editora").value;
+    const titulo = document.getElementById("titulo").value.trim();
+    const autor = document.getElementById("autor").value.trim();
+    const editora = document.getElementById("editora").value.trim();
+
+    let possuiErro = false;
+
+    if (!titulo) {
+        document.getElementById("erroTitulo").innerText = "Título é obrigatório.";
+        possuiErro = true;
+    }
+
+    if (!autor) {
+        document.getElementById("erroAutor").innerText = "Autor é obrigatório.";
+        possuiErro = true;
+    }
+
+    if (!editora) {
+        document.getElementById("erroEditora").innerText = "Editora é obrigatória.";
+        possuiErro = true;
+    }
+
+    return !possuiErro;
+}
+
+function cadastrarLivro() {
+    mostrarMensagem("", "");
+
+    if (!validarCampos()) {
+        return;
+    }
+
+    const titulo = document.getElementById("titulo").value.trim();
+    const autor = document.getElementById("autor").value.trim();
+    const editora = document.getElementById("editora").value.trim();
 
     fetch(API, {
         method: "POST",
@@ -176,42 +202,101 @@ function cadastrarLivro() {
         })
     })
     .then(response => {
-
-        if (response.ok) {
-            document.getElementById("mensagem").innerText =
-            "Livro cadastrado com sucesso.";
-
-            document.getElementById("mensagem").className =
-            "sucesso";
-
-            limparFormulario();
-            listarLivros();
-
-            return;
+        if (!response.ok) {
+            throw new Error("Erro ao cadastrar livro.");
         }
-        return response.json().then(erros => {
+        return response.json();
+    })
+    .then(() => {
+        limparFormulario();
+        mostrarMensagem("Livro cadastrado com sucesso.", "sucesso");
+        listarLivros();
+    })
+    .catch(() => {
+        mostrarMensagem("Erro ao cadastrar livro.", "erro-geral");
+    });
+}
 
-            if (erros.titulo) {
-                document.getElementById("erroTitulo").innerText =
-                    erros.titulo;
-            }
+function prepararEdicao(id, titulo, autor, editora, disponivel) {
+    document.getElementById("idLivro").value = id;
+    document.getElementById("titulo").value = titulo;
+    document.getElementById("autor").value = autor;
+    document.getElementById("editora").value = editora;
+    document.getElementById("disponivelLivro").value = disponivel;
 
-            if (erros.autor) {
-                document.getElementById("erroAutor").innerText =
-                    erros.autor;
-            }
+    document.getElementById("btnCadastrar").style.display = "none";
+    document.getElementById("btnAlterar").style.display = "inline-block";
 
-            if (erros.editora) {
-                document.getElementById("erroEditora").innerText =
-                    erros.editora;
-            }
-        });
+    limparErros();
+    mostrarMensagem("", "");
+}
+
+function alterarLivro() {
+    mostrarMensagem("", "");
+
+    if (!validarCampos()) {
+        return;
+    }
+
+    const id = document.getElementById("idLivro").value;
+    const titulo = document.getElementById("titulo").value.trim();
+    const autor = document.getElementById("autor").value.trim();
+    const editora = document.getElementById("editora").value.trim();
+    const disponivel = document.getElementById("disponivelLivro").value === "true";
+
+    fetch(API + "/" + id, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            titulo: titulo,
+            autor: autor,
+            editora: editora,
+            disponivel: disponivel
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao alterar livro.");
+        }
+        return response.json();
+    })
+    .then(() => {
+        limparFormulario();
+        mostrarMensagem("Livro alterado com sucesso.", "sucesso");
+        listarLivros();
+    })
+    .catch(() => {
+        mostrarMensagem("Erro ao alterar livro.", "erro-geral");
+    });
+}
+
+function excluirLivro(id) {
+    if (!confirm("Deseja excluir este livro?")) {
+        return;
+    }
+
+    fetch(API + "/" + id, {
+        method: "DELETE"
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao excluir livro.");
+        }
+    })
+    .then(() => {
+        limparFormulario();
+        mostrarMensagem("Livro excluído com sucesso.", "sucesso");
+        listarLivros();
+    })
+    .catch(() => {
+        mostrarMensagem("Erro ao excluir livro.", "erro-geral");
     });
 }
 
 function buscarLivro() {
-
-    const texto = document.getElementById("buscaLivro").value;
+    const texto = document.getElementById("buscaLivro").value.trim();
     const tipo = document.getElementById("tipoBusca").value;
 
     if (!texto) {
@@ -219,20 +304,9 @@ function buscarLivro() {
         return;
     }
 
-    fetch(
-        API +
-        "/buscar/" +
-        tipo +
-        "?" +
-        tipo +
-        "=" +
-        encodeURIComponent(texto)
-    )
-    .then(response => {
-
-        if (!response.ok) {
-            return response.json().then(erro => {
-
+    fetch(API + "/buscar/" + tipo + "?" + tipo + "=" + encodeURIComponent(texto))
+        .then(response => {
+            if (!response.ok) {
                 let mensagem = "";
 
                 if (tipo === "titulo") {
@@ -244,54 +318,50 @@ function buscarLivro() {
                 }
 
                 montarMensagemNaoEncontrado(mensagem);
-            });
-        }
+                return;
+            }
 
-        return response.json().then(livros => montarTabela(livros));
-    });
+            return response.json();
+        })
+        .then(livros => {
+            if (livros) {
+                montarTabela(livros);
+            }
+        });
 }
 
 function listarLivros() {
-
     fetch(API)
         .then(response => response.json())
         .then(dados => {
-            dados.sort((a, b) =>
-                a.titulo.localeCompare(b.titulo, 'pt-BR')
-            );
-
+            dados.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
             montarTabela(dados);
         });
 }
 
 function listarDisponiveis() {
-
     fetch(API + "/disponiveis")
         .then(response => response.json())
         .then(dados => {
-            dados.sort((a, b) =>
-                a.titulo.localeCompare(b.titulo, 'pt-BR')
-            );
-
+            dados.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
             montarTabela(dados);
         });
 }
 
 function listarEmprestados() {
-
     fetch(API + "/emprestados")
         .then(response => response.json())
-        .then(dados => montarTabela(dados));
+        .then(dados => {
+            dados.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+            montarTabela(dados);
+        });
 }
 
 function montarTabela(livros) {
-
     const tabela = document.getElementById("tabelaLivros");
-
     tabela.innerHTML = "";
 
     livros.forEach(livro => {
-
         tabela.innerHTML += `
             <tr>
                 <td>${livro.id}</td>
@@ -300,6 +370,16 @@ function montarTabela(livros) {
                 <td>${livro.editora}</td>
                 <td>${livro.disponivel ? 'Sim' : 'Não'}</td>
                 <td>
+                    <button onclick="prepararEdicao(
+                        ${livro.id},
+                        '${livro.titulo}',
+                        '${livro.autor}',
+                        '${livro.editora}',
+                        ${livro.disponivel}
+                    )">
+                        Editar
+                    </button>
+
                     <button onclick="excluirLivro(${livro.id})">
                         Excluir
                     </button>
@@ -309,29 +389,7 @@ function montarTabela(livros) {
     });
 }
 
-function excluirLivro(id) {
-
-    if (!confirm("Deseja excluir este livro?")) {
-        return;
-    }
-
-    fetch(API + "/" + id, {
-        method: "DELETE"
-    })
-    .then(() => {
-
-    document.getElementById("mensagem").innerText =
-        "Livro excluído com sucesso.";
-
-    document.getElementById("mensagem").className =
-        "sucesso";
-
-    listarLivros();
-});
-}
-
 function montarMensagemNaoEncontrado(mensagem) {
-
     const tabela = document.getElementById("tabelaLivros");
 
     tabela.innerHTML = `
@@ -344,10 +402,16 @@ function montarMensagemNaoEncontrado(mensagem) {
 }
 
 function limparFormulario() {
-
+    document.getElementById("idLivro").value = "";
     document.getElementById("titulo").value = "";
     document.getElementById("autor").value = "";
     document.getElementById("editora").value = "";
+    document.getElementById("disponivelLivro").value = "";
+
+    document.getElementById("btnCadastrar").style.display = "inline-block";
+    document.getElementById("btnAlterar").style.display = "none";
+
+    limparErros();
 }
 
 </script>
