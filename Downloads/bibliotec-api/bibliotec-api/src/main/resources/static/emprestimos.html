@@ -44,11 +44,17 @@
         }
         
         .erro {
-        color: red;
-        font-size: 14px;
-        margin-top: 5px;
-        margin-bottom: 10px;
-        text-align: left;
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        #mensagem {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
         }
         
         input[type=number]::-webkit-outer-spin-button,
@@ -61,7 +67,6 @@
             appearance: textfield;
             -moz-appearance: textfield;
         }
-        
     </style>
 </head>
 <body>
@@ -72,17 +77,17 @@
 
         <h1>Gerenciar Empréstimos</h1>
 
-    <input type="number"
-           id="usuarioId"
-           placeholder="ID do Usuário"
-           min="1">
-    <div id="erroUsuario" class="erro"></div>
+        <input type="number"
+               id="usuarioId"
+               placeholder="ID do Usuário"
+               min="1">
+        <div id="erroUsuario" class="erro"></div>
 
-    <input type="number"
-           id="livroId"
-           placeholder="ID do Livro"
-           min="1">
-    <div id="erroLivro" class="erro"></div>
+        <input type="number"
+               id="livroId"
+               placeholder="ID do Livro"
+               min="1">
+        <div id="erroLivro" class="erro"></div>
 
         <button onclick="realizarEmprestimo()">
             Realizar Empréstimo
@@ -112,7 +117,6 @@
         </thead>
 
         <tbody id="tabelaEmprestimos"></tbody>
-
     </table>
 
 </div>
@@ -128,12 +132,25 @@ function limparErros() {
     document.getElementById("erroLivro").innerText = "";
 }
 
+function limparMensagem() {
+    document.getElementById("mensagem").innerText = "";
+}
+
+function mostrarMensagem(texto, sucesso = true) {
+    const mensagem = document.getElementById("mensagem");
+
+    mensagem.innerText = texto;
+    mensagem.style.color = sucesso ? "green" : "red";
+    mensagem.style.fontWeight = "bold";
+}
+
 function realizarEmprestimo() {
 
     const usuarioId = document.getElementById("usuarioId").value;
     const livroId = document.getElementById("livroId").value;
 
     limparErros();
+    limparMensagem();
     
     let possuiErro = false;
 
@@ -142,7 +159,7 @@ function realizarEmprestimo() {
             "ID do usuário é obrigatório.";
         possuiErro = true;
     }
-    else if (Number(usuarioId) <= 1) {
+    else if (Number(usuarioId) < 1) {
         document.getElementById("erroUsuario").innerText =
             "O ID do usuário deve ser maior que 0.";
         possuiErro = true;
@@ -153,7 +170,7 @@ function realizarEmprestimo() {
             "ID do livro é obrigatório.";
         possuiErro = true;
     }
-    else if (Number(livroId) <= 1) {
+    else if (Number(livroId) < 1) {
         document.getElementById("erroLivro").innerText =
             "O ID do livro deve ser maior que 0.";
         possuiErro = true;
@@ -189,18 +206,23 @@ function realizarEmprestimo() {
         return response.text().then(mensagem => {
 
             if (mensagem.includes("Usuário não encontrado")) {
-                document.getElementById("erroUsuario")
-                    .innerText = "Usuário não encontrado.";
+                document.getElementById("erroUsuario").innerText =
+                    "Usuário não encontrado.";
             }
-
-            if (mensagem.includes("Livro não encontrado")) {
-                document.getElementById("erroLivro")
-                    .innerText = "Livro não encontrado.";
+            else if (mensagem.includes("Livro não encontrado")) {
+                document.getElementById("erroLivro").innerText =
+                    "Livro não encontrado.";
             }
-            if (mensagem.includes("Livro indisponível")) {
-                document.getElementById("erroLivro")
-                    .innerText =
+            else if (mensagem.includes("Livro indisponível")) {
+                document.getElementById("erroLivro").innerText =
                     "Livro indisponível! Não é possível realizar o empréstimo.";
+            }
+            else if (mensagem.includes("3 empréstimos")) {
+                document.getElementById("erroUsuario").innerText =
+                    "Usuário já possui 3 empréstimos em aberto.";
+            }
+            else {
+                mostrarMensagem("Erro ao realizar empréstimo.", false);
             }
 
             throw new Error(mensagem);
@@ -210,14 +232,23 @@ function realizarEmprestimo() {
         document.getElementById("usuarioId").value = "";
         document.getElementById("livroId").value = "";
 
-        mostrarMensagem("Empréstimo realizado com sucesso!");
+        listarEmprestimosSemLimparMensagem();
 
-        listarEmprestimos();
-    });
-    
+        mostrarMensagem("Empréstimo realizado com sucesso!", true);
+    })
+    .catch(() => {});
 }
 
 function listarEmprestimos() {
+
+    limparMensagem();
+
+    fetch(API + "/relatorio/livros-emprestados")
+        .then(response => response.json())
+        .then(emprestimos => montarTabela(emprestimos));
+}
+
+function listarEmprestimosSemLimparMensagem() {
 
     fetch(API + "/relatorio/livros-emprestados")
         .then(response => response.json())
@@ -226,10 +257,29 @@ function listarEmprestimos() {
 
 function devolverLivro(id) {
 
+    if (!confirm("Deseja devolver este livro?")) {
+        return;
+    }
+
+    limparMensagem();
+
     fetch(API + "/" + id + "/devolver", {
         method: "PUT"
     })
-    .then(() => listarEmprestimos());
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao devolver livro.");
+        }
+
+        return response.json();
+    })
+    .then(() => {
+        mostrarMensagem("Livro devolvido com sucesso!", true);
+        listarEmprestimos();
+    })
+    .catch(() => {
+        mostrarMensagem("Erro ao devolver livro.", false);
+    });
 }
 
 function montarTabela(emprestimos) {
@@ -238,30 +288,22 @@ function montarTabela(emprestimos) {
 
     tabela.innerHTML = "";
 
-    emprestimos.forEach(emprestimos => {
+    emprestimos.forEach(emprestimo => {
 
         tabela.innerHTML += `
             <tr>
-                <td>${emprestimos.id}</td>
-                <td>${emprestimos.usuario?.nome ?? ''}</td>
-                <td>${emprestimos.livro?.titulo ?? ''}</td>
-                <td>${emprestimos.dataEmprestimo ?? ''}</td>
+                <td>${emprestimo.id}</td>
+                <td>${emprestimo.usuario?.nome ?? ''}</td>
+                <td>${emprestimo.livro?.titulo ?? ''}</td>
+                <td>${emprestimo.dataEmprestimo ?? ''}</td>
                 <td class="acoes">
-                    <button onclick="devolverLivro(${emprestimos.id})">
+                    <button onclick="devolverLivro(${emprestimo.id})">
                         Devolver
                     </button>
                 </td>
             </tr>
         `;
     });
-}
-
-function mostrarMensagem(texto) {
-    const mensagem = document.getElementById("mensagem");
-
-    mensagem.innerText = texto;
-    mensagem.style.color = "green";
-    mensagem.style.fontWeight = "bold";
 }
 
 </script>
